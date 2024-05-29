@@ -2,6 +2,7 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   has_and_belongs_to_many :interests
+  has_many :user_destinations
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   after_create :set_onboarding
@@ -11,7 +12,7 @@ class User < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["interests"]
+    ["interests", "user_destinations"]
   end
   
   def self.ransackable_attributes(auth_object = nil)

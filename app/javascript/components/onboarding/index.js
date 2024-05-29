@@ -15,10 +15,42 @@ import Step2 from './step2';
 
 const Onboarding = (props) => {
   const { user } = props;
+  const [currentUser, setCurrentUser] = React.useState(user);
   const [current, setCurrent] = React.useState(0);
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-  const step1 = <Step1 user={user} current={current} setCurrent={setCurrent}/>
-  const step2 = <Step2 user={user} current={current} setCurrent={setCurrent}/>
+  const updateUser = (newUser) => {
+    if(user?.id){
+      fetch('/users/' + user?.id, {
+        method: 'PUT',
+        headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+        },
+        body: JSON.stringify({ user: { ...newUser, email: undefined, created_at: undefined, updated_at: undefined }})
+      }).then(response => {
+        if (response.ok) {
+          response.json().then(data => {
+            setCurrentUser(data);
+          });
+        }
+      }).catch(error => {
+        console.error('There was an error!', error);
+      }); 
+    }
+  }
+
+  const step1 = <Step1 
+    user={currentUser} 
+    setUser={setCurrentUser}
+    updateUser={updateUser}
+  />
+  const step2 = <Step2 
+    user={currentUser} 
+    setUser={setCurrentUser}
+    current={current} 
+    setCurrent={setCurrent}
+  />
 
   const step3 = (
     <div className="p-4">
